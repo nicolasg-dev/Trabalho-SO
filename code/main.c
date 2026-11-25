@@ -68,8 +68,9 @@ int main(int argc, char *argv[])
 #else
 
 volatile int queimaCPU;
-int sum;
+int contador;
 int duration;
+pt_mutex_t mutex;
 
 void* runner(void *param);
 
@@ -77,26 +78,36 @@ void* runner(void *param);
 // ./main "n° threads" "duração da região crítica (1 - curta, 2 - media, 3 - longa)"
                   
 int main (int argc, char *argv[]){
-    int N = atoi(argv[1]);
-    duration = atoi(argv[2]);
-    char* primitiva = "mutex";
-
     if (argc != 3){
         fprintf(stderr,"usage: a.out <integer value>\n");
 
         return -1;        
     }
+
+    int N = atoi(argv[1]);
+    duration = atoi(argv[2]);
+    //char* primitiva = "mutex";
+    contador = 0;
+
+    pthread_t Atids[N];
     pthread_t tid;
-    
+    pt_mutex_init(&mutex);    
 
 
     for (int i = 0; i < N; i++){
         if (pthread_create(&tid, NULL, runner, argv[1]))
             fprintf(stderr, "Erro na criação da thread. \n");
         //sleep(10);
-        pthread_join(tid, NULL);
+
+        Atids[i] = tid;
     }
 
+    for (int i = 0; i < N; i++){
+        pthread_join(Atids[i], NULL);
+    }
+
+    pt_mutex_destroy(&mutex);
+    printf("Contador: %d\n", contador);
     return 0;
 }
 
@@ -105,28 +116,30 @@ void *runner(void *param)
 {
     int i, upper = atoi(param);
     printf("Nova thread!\n");
-    sum = 0;
 
     switch (duration) {
         case 1:
             queimaCPU = 0;
             break;
         case 2:
-            queimaCPU = 1000;
+            queimaCPU = 2000;
             break;
         case 3:
-            queimaCPU = 1500;
+            queimaCPU = 3000;
             break;
         default:
             printf("Invalid option.\n");
     }
 
-    while(queimaCPU > 0){
-        queimaCPU--;
+    for (int i = 0; i < 30; i++){
+        pt_mutex_lock(&mutex);
+        contador++;
+        while(queimaCPU > 0){
+            queimaCPU--;
+        }
+        pt_mutex_unlock(&mutex);
     }
 
-    for (i = 1; i <= upper; i++)
-        sum += i;
 
     pthread_exit(0);
 }
