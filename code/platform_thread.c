@@ -3,23 +3,28 @@
 
 #ifdef _WIN32
     int pt_mutex_init(pt_mutex_t *mutex){
-        return InitializeCriticalSectionAndSpinCount(mutex, 0x00000400);
+        if (InitializeCriticalSectionAndSpinCount(mutex, 0x00000400))return 0;
+        else return 1;
     }
 
     int pt_mutex_lock(pt_mutex_t *mutex){
-        return EnterCriticalSection(mutex);
+        EnterCriticalSection(mutex);
+        return 0;
     }
 
     int pt_mutex_trylock(pt_mutex_t *mutex){
-        return TryEnterCriticalSection(mutex);
+        if (TryEnterCriticalSection(mutex)) return 0;
+        else return 1;
     }
 
     int pt_mutex_unlock(pt_mutex_t *mutex){
-        return LeaveCriticalSection(mutex);
+        LeaveCriticalSection(mutex);
+        return 0;
     }
 
     int pt_mutex_destroy(pt_mutex_t *mutex){
-        return DeleteCriticalSection(mutex);
+        DeleteCriticalSection(mutex);
+        return 0;
     }
 #else
 

@@ -75,11 +75,11 @@ pt_mutex_t mutex;
 void* runner(void *param);
 
 // To compile:  gcc main.c platform_thread.c -o main -pthread
-// ./main "n° threads" "duração da região crítica (1 - curta, 2 - media, 3 - longa)"
+// ./main "n° de threads" "duração da região crítica (1 - curta, 2 - media, 3 - longa)"
                   
 int main (int argc, char *argv[]){
     if (argc != 3){
-        fprintf(stderr,"usage: a.out <integer value>\n");
+        fprintf(stderr,"usage: a.out <this needs 3 args>\n");
 
         return -1;        
     }
@@ -114,25 +114,22 @@ int main (int argc, char *argv[]){
 
 void *runner(void *param)
 {
-    int i, upper = atoi(param);
-    printf("Nova thread!\n");
-
-    switch (duration) {
-        case 1:
-            queimaCPU = 0;
-            break;
-        case 2:
-            queimaCPU = 2000;
-            break;
-        case 3:
-            queimaCPU = 3000;
-            break;
-        default:
-            printf("Invalid option.\n");
-    }
-
     for (int i = 0; i < 30; i++){
         pt_mutex_lock(&mutex);
+        switch (duration) {
+            case 1:
+                queimaCPU = 0; // curta
+                break;
+            case 2:
+                queimaCPU = 10000; // media
+                break;
+            case 3:
+                queimaCPU = 1000000; // longa
+                break;
+            default:
+                printf("Invalid option.\n");
+        }
+        
         contador++;
         while(queimaCPU > 0){
             queimaCPU--;
