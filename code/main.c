@@ -2,104 +2,10 @@
 #include <stdlib.h>
 #include "platform_thread.h"
 
-
-#ifdef _WIN32
-
-#include <windows.h>
-
-DWORD Sum; /* os dados são compartilhados pelo(s) thread(s) */
-DWORD contador;
-/* o thread é executado nessa função separada */
-DWORD WINAPI Summation(LPVOID Param)
-{
-    DWORD Upper = *(DWORD*)Param;
-
-    for (DWORD i = 0; i <= Upper; i++)
-        Sum += i;
-
-    return 0;
-}
-
-void *runner(void *param)
-{
-    for (int i = 0; i < 30; i++){
-        pt_mutex_lock(&mutex);
-        switch (duration) {
-            case 1:
-                queimaCPU = 0; // curta
-                break;
-            case 2:
-                queimaCPU = 10000; // media
-                break;
-            case 3:
-                queimaCPU = 1000000; // longa
-                break;
-            default:
-                printf("Invalid option.\n");
-        }
-        
-        contador++;
-        while(queimaCPU > 0){
-            queimaCPU--;
-        }
-        pt_mutex_unlock(&mutex);
-    }
-
-
-    pthread_exit(0);
-}
-
-int main(int argc, char *argv[])
-{
-    DWORD ThreadId;
-    HANDLE ThreadHandle;
-    int Param;
-
-    if (argc != 2) {
-        fprintf(stderr, "An integer parameter is required\n");
-        return -1;
-    }
-
-    Param = atoi(argv[1]);
-
-    if (Param < 0) {
-        fprintf(stderr, "An integer >= 0 is required\n");
-        return -1;
-    }
-
-    /* cria o thread */
-    ThreadHandle = CreateThread(
-        NULL,       /* atributos default de segurança */
-        0,          /* tamanho default de pilha */
-        Summation,  /* função do thread */
-        &Param,     /* parâmetro para a função do thread */
-        0,          /* flags default de criação */
-        &ThreadId   /* retorna o identificador do thread */
-    );
-
-    if (ThreadHandle != NULL) {
-        /* agora espera que o thread seja encerrado */
-        WaitForSingleObject(ThreadHandle, INFINITE);
-
-        /* fecha o manipulador do thread */
-        CloseHandle(ThreadHandle);
-
-        printf("sum = %lu\n", (unsigned long)Sum);
-    }
-
-    return 0;
-}
-
-
-
-#else
-
 volatile int queimaCPU;
 int contador;
 int duration;
 pt_mutex_t mutex;
-
-void* runner(void *param);
 
 // To compile:  gcc main.c platform_thread.c -o main -pthread
 // ./main "n° de threads" "duração da região crítica (1 - curta, 2 - media, 3 - longa)"
@@ -121,19 +27,18 @@ int main (int argc, char *argv[]){
 
     pthread_t Atids[N];
     pthread_t tid;
-    pt_mutex_init(&mutex);    
+    pt_mutex_init(&mutex); // InitializeCriticalSectionAndSpinCount
 
 
     for (int i = 0; i < N; i++){
-        if (pt_create(&tid, NULL, runner, argv[1]))
+        if (pt_create(tid, NULL, runner, argv[1])) // CreateThread
             fprintf(stderr, "Erro na criação da thread. \n");
-        //sleep(10);
 
         Atids[i] = tid;
     }
 
     for (int i = 0; i < N; i++){
-        pt_join(Atids[i], NULL);
+        pt_join(Atids[i], NULL); // WaitForSingleObject
     }
 
     pt_mutex_destroy(&mutex);
@@ -142,7 +47,7 @@ int main (int argc, char *argv[]){
 }
 
 
-void *runner(void *param)
+DWORD runner(LPVOID param)
 {
     for (int i = 0; i < 30; i++){
         pt_mutex_lock(&mutex);
@@ -166,11 +71,6 @@ void *runner(void *param)
         }
         pt_mutex_unlock(&mutex);
     }
-
-
-    pthread_exit(0);
+    return 1;
 }
-
-
-#endif
 
