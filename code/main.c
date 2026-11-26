@@ -7,7 +7,8 @@ int contador;
 int duration;
 pt_mutex_t mutex;
 
-// To compile:  gcc main.c platform_thread.c -o main -pthread
+// Compilar (Windows):  gcc main.c platform_thread.c -o main.exe
+// Compilar (Linux):  gcc main.c platform_thread.c -o main -pthread 
 // ./main "n° de threads" "duração da região crítica (1 - curta, 2 - media, 3 - longa)"
                   
 int main (int argc, char *argv[]){
