@@ -3,17 +3,17 @@
 
 #ifdef _WIN32
 
-    DWORD WINAPI runner(LPVOID param);
-
-    int pt_join(pthread_t thread, void **retval){
+    int pt_join(pt_t thread){
         return WaitForSingleObject(thread, INFINITE);
     }
-
+/* 
     int pt_create(LPDWORD *tid
         , void* attr
         , LPTHREAD_START_ROUTINE function
-        , LPVOID param){
-        *tid = CreateThread(NULL, 0, function, &param, 0, *tid);
+        , LPVOID param) */
+    int pt_create(pt_t thread, 
+        DWORD (*start_routine)(void *), void *arg){
+        *tid = CreateThread(NULL, 0, WINAPI start_routine, arg, 0, thread);
         return 1;
     }
     //pthread_create(&tid, NULL, runner, argv[1])
@@ -43,13 +43,13 @@
     }
 #else
 
-    int pt_join(pthread_t thread, void **retval){
-            return pthread_join(thread, retval);
+    int pt_join(pt_t thread){
+        return pthread_join(thread, NULL);
     }
 
-    int pt_create(pthread_t *thread, const pthread_attr_t *attr, 
-        void *(*start_routine)(void *), void *arg){
-        return pthread_create(&thread, attr, start_routine, arg);
+    int pt_create(pt_t thread, 
+        DWORD (*start_routine)(void *), void *arg){
+        return pthread_create(&thread, NULL, (void*)start_routine, arg);
     }
 
     int pt_mutex_init(pt_mutex_t *mutex){

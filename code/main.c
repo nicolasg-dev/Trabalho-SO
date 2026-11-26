@@ -7,6 +7,8 @@ int contador;
 int duration;
 pt_mutex_t mutex;
 
+DWORD runner(LPVOID param);
+
 // Compilar (Windows):  gcc main.c platform_thread.c -o main.exe
 // Compilar (Linux):  gcc main.c platform_thread.c -o main -pthread 
 // ./main "n° de threads" "duração da região crítica (1 - curta, 2 - media, 3 - longa)"
@@ -32,14 +34,14 @@ int main (int argc, char *argv[]){
 
 
     for (int i = 0; i < N; i++){
-        if (pt_create(tid, NULL, runner, argv[1])) // CreateThread
+        if (pt_create(tid, runner, argv[1])) // CreateThread
             fprintf(stderr, "Erro na criação da thread. \n");
 
         Atids[i] = tid;
     }
 
     for (int i = 0; i < N; i++){
-        pt_join(Atids[i], NULL); // WaitForSingleObject
+        pt_join(Atids[i]); // WaitForSingleObject
     }
 
     pt_mutex_destroy(&mutex);
@@ -50,6 +52,7 @@ int main (int argc, char *argv[]){
 
 DWORD runner(LPVOID param)
 {
+    printf("Thread;\n");
     for (int i = 0; i < 30; i++){
         pt_mutex_lock(&mutex);
         switch (duration) {
