@@ -3,7 +3,8 @@
 #include "platform_thread.h"
 
 volatile int queimaCPU;
-int contador;
+int temp, N, T;
+unsigned long contador;
 int duration;
 pt_mutex_t mutex;
 
@@ -19,12 +20,28 @@ int main (int argc, char *argv[]){
         return -1;        
     }
 
-    int N = atoi(argv[1]);
-    if (N < 0) {
-        fprintf(stderr, "An integer >= 0 is required\n");
+    N = atoi(argv[1]);
+    T = 4096;
+    if (N <= 0) {
+        fprintf(stderr, "An integer > 0 is required\n");
         return -1;
     }    
-    duration = atoi(argv[2]);
+    duration = atoi(argv[2]); // 1 ou 2 ou 3.
+        switch (duration) {
+            case 1:
+                queimaCPU = 0; // curta
+                break;
+            case 2:
+                queimaCPU = 10000; // media
+                break;
+            case 3:
+                queimaCPU = 1000000; // longa
+                break;
+            default:
+                printf("Invalid option.\n");
+                return -1;
+        }
+    temp = queimaCPU;
     //char* primitiva = "mutex";
     contador = 0;
 
@@ -45,7 +62,7 @@ int main (int argc, char *argv[]){
     }
 
     pt_mutex_destroy(&mutex);
-    printf("Contador: %d\n", contador);
+    printf("Contador: %lu\n", contador);
     return 0;
 }
 
@@ -53,21 +70,10 @@ int main (int argc, char *argv[]){
 DWORD runner(LPVOID param)
 {
     printf("Thread;\n");
-    for (int i = 0; i < 30; i++){
+    
+    for (int i = 0; i < (int)T/N; i++){
         pt_mutex_lock(&mutex);
-        switch (duration) {
-            case 1:
-                queimaCPU = 0; // curta
-                break;
-            case 2:
-                queimaCPU = 10000; // media
-                break;
-            case 3:
-                queimaCPU = 1000000; // longa
-                break;
-            default:
-                printf("Invalid option.\n");
-        }
+        queimaCPU = temp;
         
         contador++;
         while(queimaCPU > 0){
