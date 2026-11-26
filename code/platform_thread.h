@@ -1,7 +1,10 @@
 #ifdef _WIN32
 #include <windows.h>
-    typedef CRITICAL_SECTION pt_mutex_t;
+#include <synchapi.h>
+#include <processthreadsapi.h>
 
+    typedef CRITICAL_SECTION pt_mutex_t;
+    typedef HANDLE pthread_t;
 #else
 #include <pthread.h>
     typedef pthread_mutex_t pt_mutex_t;

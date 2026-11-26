@@ -6,11 +6,9 @@
 #ifdef _WIN32
 
 #include <windows.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 DWORD Sum; /* os dados são compartilhados pelo(s) thread(s) */
-
+DWORD contador;
 /* o thread é executado nessa função separada */
 DWORD WINAPI Summation(LPVOID Param)
 {
@@ -20,6 +18,35 @@ DWORD WINAPI Summation(LPVOID Param)
         Sum += i;
 
     return 0;
+}
+
+void *runner(void *param)
+{
+    for (int i = 0; i < 30; i++){
+        pt_mutex_lock(&mutex);
+        switch (duration) {
+            case 1:
+                queimaCPU = 0; // curta
+                break;
+            case 2:
+                queimaCPU = 10000; // media
+                break;
+            case 3:
+                queimaCPU = 1000000; // longa
+                break;
+            default:
+                printf("Invalid option.\n");
+        }
+        
+        contador++;
+        while(queimaCPU > 0){
+            queimaCPU--;
+        }
+        pt_mutex_unlock(&mutex);
+    }
+
+
+    pthread_exit(0);
 }
 
 int main(int argc, char *argv[])
@@ -80,11 +107,14 @@ void* runner(void *param);
 int main (int argc, char *argv[]){
     if (argc != 3){
         fprintf(stderr,"usage: a.out <this needs 3 args>\n");
-
         return -1;        
     }
 
     int N = atoi(argv[1]);
+    if (N < 0) {
+        fprintf(stderr, "An integer >= 0 is required\n");
+        return -1;
+    }    
     duration = atoi(argv[2]);
     //char* primitiva = "mutex";
     contador = 0;
@@ -95,7 +125,7 @@ int main (int argc, char *argv[]){
 
 
     for (int i = 0; i < N; i++){
-        if (pthread_create(&tid, NULL, runner, argv[1]))
+        if (pt_create(&tid, NULL, runner, argv[1]))
             fprintf(stderr, "Erro na criação da thread. \n");
         //sleep(10);
 
@@ -103,7 +133,7 @@ int main (int argc, char *argv[]){
     }
 
     for (int i = 0; i < N; i++){
-        pthread_join(Atids[i], NULL);
+        pt_join(Atids[i], NULL);
     }
 
     pt_mutex_destroy(&mutex);
