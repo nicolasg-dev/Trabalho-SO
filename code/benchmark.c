@@ -54,7 +54,7 @@ int benchmark (char *argv[], int repeticao){
     pt_clock(&t_inicial);
 
     for (int i = 0; i < N; i++){
-        if (pt_create(tid, runner, argv[1])) // CreateThread
+        if (pt_create(&tid, runner, argv[1])) // CreateThread
             fprintf(stderr, "Erro na criação da thread. \n");
 
         Atids[i] = tid;

@@ -24,7 +24,7 @@ int pt_mutex_trylock(pt_mutex_t *mutex);
 int pt_mutex_unlock(pt_mutex_t *mutex);
 int pt_mutex_destroy(pt_mutex_t *mutex);
 int pt_join(pt_t thread);
-int pt_create(pt_t thread, 
+int pt_create(pt_t *thread, 
     DWORD (*start_routine)(void *), void *arg);
 
 #endif // PLATFORM_THREAD_H

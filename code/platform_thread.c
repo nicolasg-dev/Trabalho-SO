@@ -29,7 +29,7 @@
         , void* attr
         , LPTHREAD_START_ROUTINE function
         , LPVOID param) */
-    int pt_create(pt_t thread, 
+    int pt_create(pt_t *thread, 
         DWORD (*start_routine)(void *), void *arg){
         thread = CreateThread(NULL, 0, start_routine, arg, 0, thread);
         if (thread != NULL) return 0;
@@ -78,9 +78,9 @@
         return pthread_join(thread, NULL);
     }
 
-    int pt_create(pt_t thread, 
+    int pt_create(pt_t *thread, 
         DWORD (*start_routine)(void *), void *arg){
-        return pthread_create(&thread, NULL, (void*)start_routine, arg);
+        return pthread_create(thread, NULL, (void*)start_routine, arg);
     }
 
     int pt_mutex_init(pt_mutex_t *mutex){
