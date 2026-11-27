@@ -4,7 +4,7 @@
 
 volatile int queimaCPU;
 int temp, N, T, duration;
-unsigned long contador;
+unsigned long contador_final, contador_esperado;
 pt_mutex_t mutex;
 
 DWORD runner(LPVOID param);
@@ -19,25 +19,28 @@ int benchmark (char *argv[], int qual){
 
     N = atoi(argv[1]);
     T = 4096;
-
+    contador_esperado = N * T/N;
+    char* strDuration;
     duration = atoi(argv[2]); // 1 ou 2 ou 3.
         switch (duration) {
             case 1:
                 queimaCPU = 0; // curta
+                strDuration = "curta";
                 break;
             case 2:
                 queimaCPU = 10000; // media
+                strDuration = "media";
                 break;
             case 3:
                 queimaCPU = 1000000; // longa
+                strDuration = "longa";
                 break;
             default:
                 printf("Invalid option.\n");
                 return -1;
-        }
+        } 
     temp = queimaCPU;
-    //char* primitiva = "mutex";
-    contador = 0;
+    contador_final = 0;
 
     pt_t Atids[N];
     pt_t tid;
@@ -58,11 +61,11 @@ int benchmark (char *argv[], int qual){
     pt_mutex_destroy(&mutex);
     
     #ifdef _WIN32
-        fprintf(arquivo, "Windows,%s,%d,%d,%d,tempo_bruto,%lu,%d\n", argv[3], N, duration, qual, T, contador, N*T/N);
+        fprintf(arquivo, "Windows,%s,%d,%s,%d,%lu,%lu", argv[3], N, strDuration, qual, T, contador_final, contador_esperado);
     #else
-        fprintf(arquivo, "Linux,%s,%d,%d,%d,tempo_bruto,%lu,%d\n", argv[3], N, duration, qual, T, contador, N*T/N);
+        fprintf(arquivo, "Linux,%s,%d,%s,%d,%lu,%lu", argv[3], N, strDuration, qual, T, contador_final, contador_esperado);
     #endif 
-    //plataforma,primitiva,N,duracao,repeticao,tempo_bruto,T,contador_final,contador_esperado
+    //plataforma,primitiva,N,duracao,repeticao,T,contador_final,contador_esperado,tempo_bruto
 
     fclose(arquivo);
     return 0;
@@ -76,7 +79,7 @@ DWORD runner(LPVOID param)
         pt_mutex_lock(&mutex);
         queimaCPU = temp;
         
-        contador++;
+        contador_final++;
         while(queimaCPU > 0){
             queimaCPU--;
         }

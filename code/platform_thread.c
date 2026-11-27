@@ -3,6 +3,25 @@
 
 #ifdef _WIN32
 
+    unsigned long long pt_time_now(int (*benchmark)(char**, int)){
+
+        LARGE_INTEGER inicio, fim, frequencia;
+
+        QueryPerformanceFrequency(&frequencia);
+
+        QueryPerformanceCounter(&inicio);
+
+        benchmark;
+
+        QueryPerformanceCounter(&fim);
+
+        unsigned long long tempo = (double)(fim.QuadPart - inicio.QuadPart)
+                    / frequencia.QuadPart;
+
+        return tempo;
+
+    }
+
     int pt_join(pt_t thread){
         return WaitForSingleObject(thread, INFINITE);
     }
@@ -44,6 +63,26 @@
     }
 #else
 
+    double pt_time_now(int (*benchmark)(char**, int)){
+
+        LARGE_INTEGER inicio, fim, frequencia;
+
+        QueryPerformanceFrequency(&frequencia);
+
+        QueryPerformanceCounter(&inicio);
+
+        benchmark;
+
+        QueryPerformanceCounter(&fim);
+
+        double tempo = (double)(fim.QuadPart - inicio.QuadPart)
+                    / frequencia.QuadPart;
+
+        printf("Tempo: %f segundos\n", tempo);
+
+        return tempo;
+
+    }
     int pt_join(pt_t thread){
         return pthread_join(thread, NULL);
     }

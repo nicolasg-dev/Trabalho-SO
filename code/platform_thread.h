@@ -7,13 +7,14 @@
     typedef HANDLE pt_t;
 #else
 #include <pthread.h>
+#include <time.h>
     typedef unsigned long DWORD;
     typedef pthread_mutex_t pt_mutex_t;
     typedef void* LPVOID;
     typedef pthread_t pt_t;
 #endif
 
-int benchmark (char *argv[], int qual);
+unsigned long long pt_time_now(int (*benchmark)(char**, int));
 int pt_mutex_init(pt_mutex_t *mutex);
 int pt_mutex_lock(pt_mutex_t *mutex);
 int pt_mutex_trylock(pt_mutex_t *mutex);

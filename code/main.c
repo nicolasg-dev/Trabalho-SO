@@ -2,12 +2,14 @@
 #include <stdlib.h>
 #include "platform_thread.h"
 
+int benchmark (char *argv[], int qual);
+
 // Compilar (Windows):  gcc main.c benchmark.c platform_thread.c -o main.exe
 // Compilar (Linux):  gcc main.c benchmark.c platform_thread.c -o main -pthread 
-// ./main "n° de threads" "duração da região crítica (1 - curta, 2 - media, 3 - longa)"
+// ./main "n° threads" "duração da região crítica (1 - curta, 2 - media, 3 - longa)" "mutex/spin-lock"
   
 int main (int argc, char* argv[]){
-    if (argc != 3){
+    if (argc != 4){
         fprintf(stderr,"usage: <this needs 4 args>\n");
         return -1;        
     }
@@ -16,13 +18,20 @@ int main (int argc, char* argv[]){
         return -1;
     }
     
+    FILE *arquivo = fopen("dados_brutos.csv", "a");
 
-    for (int i = 1; i <= 5; i++){
-        if(benchmark(argv, i)){
-            fprintf(stderr, "Erro em algum benchmark \n");
-        }
+    if (arquivo == NULL) {
+        perror("Erro ao abrir o arquivo");
+        return -1;
     }
-
+    double tempo_bruto;
+    for (int i = 1; i <= 30; i++){
+        benchmark(argv, i);
+        tempo_bruto = pt_time_now(benchmark);
+        fprintf(arquivo, "%f\n", tempo_bruto);
+    }
+    
+    fclose(arquivo);
 
     return 0;
 }
