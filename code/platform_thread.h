@@ -13,6 +13,7 @@
     typedef pthread_t pt_t;
 #endif
 
+int benchmark (char *argv[]);
 int pt_mutex_init(pt_mutex_t *mutex);
 int pt_mutex_lock(pt_mutex_t *mutex);
 int pt_mutex_trylock(pt_mutex_t *mutex);
