@@ -13,7 +13,8 @@
         , LPVOID param) */
     int pt_create(pt_t thread, 
         DWORD (*start_routine)(void *), void *arg){
-        *tid = CreateThread(NULL, 0, WINAPI start_routine, arg, 0, thread);
+        thread = CreateThread(NULL, 0, start_routine, arg, 0, thread);
+        if (thread != NULL) return 0;
         return 1;
     }
     //pthread_create(&tid, NULL, runner, argv[1])

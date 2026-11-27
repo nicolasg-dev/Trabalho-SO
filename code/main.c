@@ -69,9 +69,8 @@ int main (int argc, char *argv[]){
 
 DWORD runner(LPVOID param)
 {
-    printf("Thread;\n");
     
-    for (int i = 0; i < (int)T/N; i++){
+    for (int i = 0; i < T/N; i++){
         pt_mutex_lock(&mutex);
         queimaCPU = temp;
         
