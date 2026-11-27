@@ -14,7 +14,7 @@
         //resto = atual.QuadPart
         //            % frequencia.QuadPart;
         
-        *tempo = 1000000000 * atual.QuadPart
+        *tempo = 1000000000LL * atual.QuadPart
                     / frequencia.QuadPart;
         return 0;
     }
@@ -60,24 +60,16 @@
     }
 #else
 
-    double pt_clock(int (*benchmark)(char**, int)){
+    int pt_clock(unsigned long long *tempo){
+        struct timespec tspc;
+        clock_gettime(1, &tspc);
+        
+        *tempo = 
+            (tspc.tv_sec * 1000000000LL) + tspc.tv_nsec;
 
-        LARGE_INTEGER inicio, fim, frequencia;
+        
+        return 0;
 
-        QueryPerformanceFrequency(&frequencia);
-
-        QueryPerformanceCounter(&inicio);
-
-        benchmark;
-
-        QueryPerformanceCounter(&fim);
-
-        double tempo = (double)(fim.QuadPart - inicio.QuadPart)
-                    / frequencia.QuadPart;
-
-        printf("Tempo: %f segundos\n", tempo);
-
-        return tempo;
 
     }
     int pt_join(pt_t thread){
