@@ -45,8 +45,8 @@ int main (int argc, char *argv[]){
     //char* primitiva = "mutex";
     contador = 0;
 
-    pthread_t Atids[N];
-    pthread_t tid;
+    pt_t Atids[N];
+    pt_t tid;
     pt_mutex_init(&mutex); // InitializeCriticalSectionAndSpinCount
 
 
