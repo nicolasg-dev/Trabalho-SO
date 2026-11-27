@@ -2,15 +2,13 @@
 #include <stdlib.h>
 #include "platform_thread.h"
 
-
-
 // Compilar (Windows):  gcc main.c benchmark.c platform_thread.c -o main.exe
 // Compilar (Linux):  gcc main.c benchmark.c platform_thread.c -o main -pthread 
 // ./main "n° de threads" "duração da região crítica (1 - curta, 2 - media, 3 - longa)"
   
 int main (int argc, char* argv[]){
     if (argc != 3){
-        fprintf(stderr,"usage: <this needs 3 args>\n");
+        fprintf(stderr,"usage: <this needs 4 args>\n");
         return -1;        
     }
     if (atoi(argv[1]) <= 0) {
@@ -19,8 +17,8 @@ int main (int argc, char* argv[]){
     }
     
 
-    for (int i = 0; i < 5; i++){
-        if(benchmark(argv)){
+    for (int i = 1; i <= 5; i++){
+        if(benchmark(argv, i)){
             fprintf(stderr, "Erro em algum benchmark \n");
         }
     }

@@ -3,14 +3,13 @@
 #include "platform_thread.h"
 
 volatile int queimaCPU;
-int temp, N, T;
+int temp, N, T, duration;
 unsigned long contador;
-int duration;
 pt_mutex_t mutex;
 
 DWORD runner(LPVOID param);
                 
-int benchmark (char *argv[]){
+int benchmark (char *argv[], int qual){
     FILE *arquivo = fopen("dados_brutos.csv", "a");
 
     if (arquivo == NULL) {
@@ -57,10 +56,14 @@ int benchmark (char *argv[]){
     }
 
     pt_mutex_destroy(&mutex);
-    fprintf(arquivo, "Linux,mutex,100,1,15.32\n");
-
-    printf("Contador: %lu\n", contador);
     
+    #ifdef _WIN32
+        fprintf(arquivo, "Windows,%s,%d,%d,%d,tempo_bruto,%lu,%d\n", argv[3], N, duration, qual, T, contador, N*T/N);
+    #else
+        fprintf(arquivo, "Linux,%s,%d,%d,%d,tempo_bruto,%lu,%d\n", argv[3], N, duration, qual, T, contador, N*T/N);
+    #endif 
+    //plataforma,primitiva,N,duracao,repeticao,tempo_bruto,T,contador_final,contador_esperado
+
     fclose(arquivo);
     return 0;
 }
