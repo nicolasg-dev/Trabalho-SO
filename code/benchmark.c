@@ -2,15 +2,14 @@
 #include <stdlib.h>
 #include "platform_thread.h"
 
-volatile int queimaCPU;
-int temp, N, T, duration;
-unsigned long contador_final, contador_esperado;
-unsigned long long t_inicial, t_final;
-pt_mutex_t mutex;
-
 DWORD runner(LPVOID param);
-                
+volatile int queimaCPU;
+pt_mutex_t mutex;             
+int temp, N, T;
+unsigned long contador_final;
+
 int benchmark (char *argv[], int repeticao){
+
     FILE *arquivo = fopen("dados_brutos.csv", "a");
 
     if (arquivo == NULL) {
@@ -18,9 +17,14 @@ int benchmark (char *argv[], int repeticao){
         return -1;
     }
 
+    int duration;
+    unsigned long contador_esperado = 0;
+    unsigned long long t_inicial = 0, t_final = 0;
+    
+
     N = atoi(argv[1]);
     T = 4096;
-    contador_esperado = N * T/N;
+    contador_esperado = T;
     char* strDuration;
     duration = atoi(argv[2]); // 1 ou 2 ou 3.
         switch (duration) {
@@ -29,11 +33,11 @@ int benchmark (char *argv[], int repeticao){
                 strDuration = "curta";
                 break;
             case 2:
-                queimaCPU = 10000; // media
+                queimaCPU = 400; // media
                 strDuration = "media";
                 break;
             case 3:
-                queimaCPU = 1000000; // longa
+                queimaCPU = 40000; // longa
                 strDuration = "longa";
                 break;
             default:

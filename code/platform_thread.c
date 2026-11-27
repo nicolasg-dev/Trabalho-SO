@@ -20,7 +20,9 @@
     }
 
     int pt_join(pt_t thread){
-        return WaitForSingleObject(thread, INFINITE);
+
+        if (!WaitForSingleObject(thread, INFINITE)) return -1;
+        return (!CloseHandle(thread));
     }
 /* 
     int pt_create(LPDWORD *tid
@@ -62,7 +64,7 @@
 
     int pt_clock(unsigned long long *tempo){
         struct timespec tspc;
-        clock_gettime(1, &tspc);
+        clock_gettime(CLOCK_MONOTONIC, &tspc);
         
         *tempo = 
             (tspc.tv_sec * 1000000000LL) + tspc.tv_nsec;
