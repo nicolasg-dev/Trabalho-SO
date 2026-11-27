@@ -3,7 +3,7 @@
 #include "platform_thread.h"
 
 int benchmark (char *argv[], int repeticao);
-//unsigned long long tempo_inicial = 0, tempo_final = 0;
+unsigned long long tempo_inicial = 0, tempo_final = 0;
 
 // Compilar (Windows):  gcc main.c benchmark.c platform_thread.c -o main.exe
 // Compilar (Linux):  gcc main.c benchmark.c platform_thread.c -o main -pthread 
@@ -23,8 +23,13 @@ int main (int argc, char* argv[]){
         if(benchmark(argv, i)){
             fprintf(stderr, "Erro em algum benchmark!\n");
         }
-    } 
+    }
     
-    //printf("%llu", tempo_final - tempo_inicial);
+
+/*     pt_clock(&tempo_inicial);
+    Sleep(1000);
+    pt_clock(&tempo_final);
+
+    printf("%llu\n", tempo_final - tempo_inicial); */
     return 0;
 }

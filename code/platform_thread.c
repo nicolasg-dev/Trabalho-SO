@@ -14,10 +14,8 @@
         //resto = atual.QuadPart
         //            % frequencia.QuadPart;
         
-        *tempo = atual.QuadPart
+        *tempo = 1000000000 * atual.QuadPart
                     / frequencia.QuadPart;
-                    
-        *tempo = (*tempo) * 1000000000;
         return 0;
     }
 
