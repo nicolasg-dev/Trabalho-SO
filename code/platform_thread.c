@@ -3,23 +3,22 @@
 
 #ifdef _WIN32
 
-    unsigned long long pt_time_now(int (*benchmark)(char**, int)){
-
-        LARGE_INTEGER inicio, fim, frequencia;
+    int pt_clock(unsigned long long *tempo){
+        //unsigned long long resto = 0;
+        LARGE_INTEGER atual, frequencia;
 
         QueryPerformanceFrequency(&frequencia);
 
-        QueryPerformanceCounter(&inicio);
+        QueryPerformanceCounter(&atual);
 
-        benchmark;
-
-        QueryPerformanceCounter(&fim);
-
-        unsigned long long tempo = (double)(fim.QuadPart - inicio.QuadPart)
+        //resto = atual.QuadPart
+        //            % frequencia.QuadPart;
+        
+        *tempo = atual.QuadPart
                     / frequencia.QuadPart;
-
-        return tempo;
-
+                    
+        *tempo = (*tempo) * 1000000000;
+        return 0;
     }
 
     int pt_join(pt_t thread){
@@ -63,7 +62,7 @@
     }
 #else
 
-    double pt_time_now(int (*benchmark)(char**, int)){
+    double pt_clock(int (*benchmark)(char**, int)){
 
         LARGE_INTEGER inicio, fim, frequencia;
 

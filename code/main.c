@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include "platform_thread.h"
 
-int benchmark (char *argv[], int qual);
+int benchmark (char *argv[], int repeticao);
+//unsigned long long tempo_inicial = 0, tempo_final = 0;
 
 // Compilar (Windows):  gcc main.c benchmark.c platform_thread.c -o main.exe
 // Compilar (Linux):  gcc main.c benchmark.c platform_thread.c -o main -pthread 
@@ -17,21 +18,13 @@ int main (int argc, char* argv[]){
         fprintf(stderr, "An integer > 0 is required\n");
         return -1;
     }
-    
-    FILE *arquivo = fopen("dados_brutos.csv", "a");
-
-    if (arquivo == NULL) {
-        perror("Erro ao abrir o arquivo");
-        return -1;
-    }
-    double tempo_bruto;
+     
     for (int i = 1; i <= 30; i++){
-        benchmark(argv, i);
-        tempo_bruto = pt_time_now(benchmark);
-        fprintf(arquivo, "%f\n", tempo_bruto);
-    }
+        if(benchmark(argv, i)){
+            fprintf(stderr, "Erro em algum benchmark!\n");
+        }
+    } 
     
-    fclose(arquivo);
-
+    //printf("%llu", tempo_final - tempo_inicial);
     return 0;
 }

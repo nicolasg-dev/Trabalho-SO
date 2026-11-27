@@ -5,11 +5,12 @@
 volatile int queimaCPU;
 int temp, N, T, duration;
 unsigned long contador_final, contador_esperado;
+unsigned long long t_inicial, t_final;
 pt_mutex_t mutex;
 
 DWORD runner(LPVOID param);
                 
-int benchmark (char *argv[], int qual){
+int benchmark (char *argv[], int repeticao){
     FILE *arquivo = fopen("dados_brutos.csv", "a");
 
     if (arquivo == NULL) {
@@ -46,6 +47,7 @@ int benchmark (char *argv[], int qual){
     pt_t tid;
     pt_mutex_init(&mutex); // InitializeCriticalSectionAndSpinCount
 
+    pt_clock(&t_inicial);
 
     for (int i = 0; i < N; i++){
         if (pt_create(tid, runner, argv[1])) // CreateThread
@@ -58,14 +60,16 @@ int benchmark (char *argv[], int qual){
         pt_join(Atids[i]); // WaitForSingleObject
     }
 
+    pt_clock(&t_final);
+
     pt_mutex_destroy(&mutex);
     
     #ifdef _WIN32
-        fprintf(arquivo, "Windows,%s,%d,%s,%d,%lu,%lu", argv[3], N, strDuration, qual, T, contador_final, contador_esperado);
+        fprintf(arquivo, "Windows,%s,%d,%s,%llu,%d,%lu,%lu\n", argv[3], N, strDuration, t_final - t_inicial, repeticao, T, contador_final, contador_esperado);
     #else
-        fprintf(arquivo, "Linux,%s,%d,%s,%d,%lu,%lu", argv[3], N, strDuration, qual, T, contador_final, contador_esperado);
+        fprintf(arquivo, "Linux,%s,%d,%s,%llu,%d,%lu,%lu\n", argv[3], N, strDuration, t_final - t_inicial,repeticao, T, contador_final, contador_esperado);
     #endif 
-    //plataforma,primitiva,N,duracao,repeticao,T,contador_final,contador_esperado,tempo_bruto
+    //plataforma,primitiva,N,duracao,tempo_bruto,repeticao,T,contador_final,contador_esperado
 
     fclose(arquivo);
     return 0;

@@ -1,3 +1,6 @@
+#ifndef PLATFORM_THREAD_H
+#define PLATFORM_THREAD_H
+
 #ifdef _WIN32
 #include <windows.h>
 //#include <synchapi.h>
@@ -14,7 +17,7 @@
     typedef pthread_t pt_t;
 #endif
 
-unsigned long long pt_time_now(int (*benchmark)(char**, int));
+int pt_clock(unsigned long long *tempo);
 int pt_mutex_init(pt_mutex_t *mutex);
 int pt_mutex_lock(pt_mutex_t *mutex);
 int pt_mutex_trylock(pt_mutex_t *mutex);
@@ -23,3 +26,5 @@ int pt_mutex_destroy(pt_mutex_t *mutex);
 int pt_join(pt_t thread);
 int pt_create(pt_t thread, 
     DWORD (*start_routine)(void *), void *arg);
+
+#endif // PLATFORM_THREAD_H
