@@ -1,1 +1,1 @@
-# Trabalho - Sistemas Operacionais
+# Trabalho Sistemas Operacionais
