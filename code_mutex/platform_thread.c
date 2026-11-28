@@ -31,7 +31,7 @@
         , LPVOID param) */
     int pt_create(pt_t *thread, 
         DWORD (*start_routine)(void *), void *arg){
-        thread = CreateThread(NULL, 0, start_routine, arg, 0, thread);
+        thread = CreateThread(NULL, 0, start_routine, arg, 0, NULL);
         if (thread != NULL) return 0;
         return 1;
     }
